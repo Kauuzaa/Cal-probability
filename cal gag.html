@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gacha Animal Probability Calculator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter&family=Poppins:wght@700&display=swap');
+
+  :root {
+    --color-bg: #ffffff;
+    --color-text: #374151;
+    --color-subtext: #6b7280;
+    --color-primary: #111827;
+    --color-button-bg: #111827;
+    --color-button-text: #ffffff;
+    --radius: 0.75rem;
+    --shadow-light: rgba(0, 0, 0, 0.07);
+    --font-headline: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1rem;
+  }
+
+  header {
+    max-width: 1200px;
+    width: 100%;
+    padding: 0 1rem;
+    margin-bottom: 3rem;
+  }
+
+  h1 {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: clamp(2.75rem, 4vw, 4.5rem);
+    color: var(--color-primary);
+    margin: 0;
+    line-height: 1.1;
+    user-select: none;
+  }
+
+  main {
+    max-width: 600px;
+    width: 100%;
+    background: #f9fafb;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 20px var(--shadow-light);
+    padding: 2.5rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  p.description {
+    color: var(--color-subtext);
+    font-size: 1.1rem;
+    margin: 0 0 2rem 0;
+    user-select: none;
+  }
+
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2rem;
+    justify-content: center;
+  }
+
+  label {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-primary);
+    min-width: 130px;
+    text-align: right;
+    user-select: none;
+  }
+
+  input[type="number"],
+  select {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius);
+    border: 1.5px solid #d1d5db;
+    min-width: 140px;
+    outline-offset: 2px;
+    transition: border-color 0.3s ease;
+    cursor: pointer;
+  }
+  input[type="number"]:focus,
+  select:focus {
+    border-color: var(--color-primary);
+  }
+
+  button {
+    margin-top: 1rem;
+    background-color: var(--color-button-bg);
+    border: none;
+    color: var(--color-button-text);
+    font-weight: 700;
+    padding: 0.75rem 1.75rem;
+    font-size: 1.1rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    user-select: none;
+    min-width: 160px;
+    align-self: center;
+  }
+  button:hover,
+  button:focus {
+    background-color: #374151;
+    transform: scale(1.05);
+    outline-offset: 2px;
+  }
+
+  .result {
+    margin-top: 2rem;
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--color-primary);
+    min-height: 1.6em;
+    text-align: center;
+    user-select: text;
+  }
+
+  footer {
+    margin-top: 4rem;
+    width: 100%;
+    max-width: 1200px;
+    padding: 1rem;
+    color: var(--color-subtext);
+    text-align: center;
+    font-size: 0.9rem;
+    user-select: none;
+  }
+
+  @media (max-width: 480px) {
+    form {
+      flex-direction: column;
+    }
+    label {
+      text-align: left;
+      min-width: auto;
+      width: 100%;
+    }
+    input[type="number"],
+    select,
+    button {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Gacha Animal Probability Calculator</h1>
+</header>
+<main>
+  <p class="description">
+    Enter the number of eggs, select the egg category and animal to calculate the probability of getting at least one of that animal.
+  </p>
+  <form id="calcForm" aria-describedby="resultText">
+    <label for="eggCount">Number of Eggs:</label>
+    <input
+      type="number"
+      id="eggCount"
+      name="eggCount"
+      min="1"
+      value="100"
+      required
+      aria-required="true"
+      aria-label="Number of eggs"
+    />
+    <label for="categorySelect">Egg Category:</label>
+    <select id="categorySelect" name="categorySelect" aria-label="Select egg category" >
+      <option value="bug">Bug Egg</option>
+      <option value="bee">Bee Egg</option>
+      <option value="mythical">Mythical Egg</option>
+      <option value="legendary">Legendary Egg</option>
+    </select>
+    <label for="animalSelect">Animal:</label>
+    <select id="animalSelect" name="animalSelect" aria-label="Select animal">
+      <!-- Options populated dynamically -->
+    </select>
+    <button type="submit" aria-label="Calculate probability">Calculate</button>
+  </form>
+  <div class="result" id="resultText" aria-live="polite"></div>
+</main>
+<footer>
+  &copy; 2025 Gacha Probability Calculator
+</footer>
+<script>
+  (() => {
+    const form = document.getElementById('calcForm');
+    const eggInput = document.getElementById('eggCount');
+    const categorySelect = document.getElementById('categorySelect');
+    const animalSelect = document.getElementById('animalSelect');
+    const resultDiv = document.getElementById('resultText');
+
+    // Animal data keyed by category
+    const animals = {
+      bug: [
+        {name: 'Snail', chance: 0.40},
+        {name: 'Ant', chance: 0.30},
+        {name: 'Caterpillar', chance: 0.25},
+        {name: 'Praying Mantis', chance: 0.04},
+        {name: 'Dragonfly', chance: 0.01}
+      ],
+      bee: [
+        {name: 'Bee', chance: 0.65},
+        {name: 'Honey Bee', chance: 0.25},
+        {name: 'Bear Bee', chance: 0.05},
+        {name: 'Petal Bee', chance: 0.04},
+        {name: 'Queen Bee', chance: 0.01}
+      ],
+      mythical: [
+        {name: 'Grey Mouse', chance: 0.3571},
+        {name: 'Brown Mouse', chance: 0.2679},
+        {name: 'Squirrel', chance: 0.2679},
+        {name: 'Red Giant Ant', chance: 0.0893},
+        {name: 'Red Fox', chance: 0.0179}
+      ],
+      legendary: [
+        {name: 'Cow', chance: 0.4255},
+        {name: 'Silver Monkey', chance: 0.4255},
+        {name: 'Sea Otter', chance: 0.1064},
+        {name: 'Turtle', chance: 0.0213},
+        {name: 'Polar Bear', chance: 0.0213}
+      ]
+    };
+
+    // Populate animal select based on category
+    function populateAnimalSelect(category) {
+      animalSelect.innerHTML = '';
+      animals[category].forEach(({name, chance}) => {
+        const option = document.createElement('option');
+        option.value = chance;
+        option.textContent = `${name} (${(chance * 100).toFixed(2)}%)`;
+        animalSelect.appendChild(option);
+      });
+    }
+
+    function calculateProbability(numEggs, chancePerEgg) {
+      if (numEggs <= 0 || chancePerEgg <= 0) return 0;
+      // Probability of at least one = 1 - (probability of zero occurrences)
+      return 1 - Math.pow(1 - chancePerEgg, numEggs);
+    }
+
+    function displayResult(prob, animalName, chancePerEgg, numEggs) {
+      const percentage = (prob * 100).toFixed(2);
+      const singleChance = (chancePerEgg * 100).toFixed(2);
+      return `With <strong>${numEggs}</strong> eggs, the probability of getting at least one <strong>${animalName}</strong> (chance per egg: ${singleChance}%) is <strong>${percentage}%</strong>.`;
+    }
+
+    // Update result based on form inputs
+    function updateResult() {
+      const eggs = parseInt(eggInput.value, 10);
+      const category = categorySelect.value;
+      const chance = parseFloat(animalSelect.value);
+      const animalName = animalSelect.options[animalSelect.selectedIndex]?.textContent.split(' (')[0] || '';
+
+      if (isNaN(eggs) || eggs < 1) {
+        resultDiv.innerHTML = 'Please enter a valid number of eggs (minimum 1).';
+        return;
+      }
+      if (!animals[category]) {
+        resultDiv.innerHTML = 'Unknown egg category selected.';
+        return;
+      }
+      const prob = calculateProbability(eggs, chance);
+      resultDiv.innerHTML = displayResult(prob, animalName, chance, eggs);
+    }
+
+    // Event listeners
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      updateResult();
+    });
+
+    categorySelect.addEventListener('change', () => {
+      populateAnimalSelect(categorySelect.value);
+      updateResult();
+    });
+
+    animalSelect.addEventListener('change', () => {
+      updateResult();
+    });
+
+    eggInput.addEventListener('input', () => {
+      updateResult();
+    });
+
+    // Initial population and calculation
+    populateAnimalSelect(categorySelect.value);
+    document.addEventListener('DOMContentLoaded', () => updateResult());
+  })();
+</script>
+</body>
+</html>
